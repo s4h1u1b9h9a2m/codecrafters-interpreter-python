@@ -124,6 +124,7 @@ def main():
         file_contents = file.read()
 
     # Uncomment this block to pass the first stage
+    tokens = []
     if file_contents:
         tokens = scan_tokens(file_contents)
     else:
