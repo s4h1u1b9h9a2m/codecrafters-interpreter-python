@@ -69,13 +69,16 @@ class Token:
 # This function will scan for tokens and return array of tokens
 def scan_tokens(content):
     tokens = []
+    line = 1
     # token = ""
 
     for character in content:
         # print(character)
-        if character == " " or character == "\r" or character == "\t" or character == "\n":
+        if character in [" ", "\r", "\t"]:
             # token = ""
             pass
+        elif character == "\n":
+            line += 1
         elif character in [
             TokenType.LEFT_PAREN.value,
             TokenType.RIGHT_PAREN.value,
@@ -92,6 +95,8 @@ def scan_tokens(content):
             tokens.append(Token(TokenType(character), character, None, 0))
         # elif character == "=" and content[content.index(character) + 1] == "=":
         #     token = "=="
+        else:
+            sys.stderr.write(f"[line {line}] Error: Unexpected character: {character}\n")
         
 
     tokens.append(Token(TokenType.EOF, "", None, 0))
