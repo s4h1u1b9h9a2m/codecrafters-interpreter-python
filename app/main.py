@@ -1,6 +1,8 @@
 import sys
 from enum import Enum
 
+IS_ERROR_IN_CODE = False
+
 class TokenType(Enum):
     EOF = 0
 
@@ -96,6 +98,8 @@ def scan_tokens(content):
         # elif character == "=" and content[content.index(character) + 1] == "=":
         #     token = "=="
         else:
+            global IS_ERROR_IN_CODE
+            IS_ERROR_IN_CODE = True
             sys.stderr.write(f"[line {line}] Error: Unexpected character: {character}\n")
         
 
@@ -138,6 +142,8 @@ def main():
     for token in tokens:
         print(token)
 
+    if IS_ERROR_IN_CODE:
+        return 65
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
