@@ -31,3 +31,19 @@ Note: This section is for stages 2 and beyond.
    `app/main.py`.
 1. Commit your changes and run `git push origin master` to submit your solution
    to CodeCrafters. Test output will be streamed to your terminal.
+
+## Make sure you're using your id
+```
+git config user.name "s4h1u1b9h9a2m"
+```
+
+## For windows, test in Docker
+```
+docker build -t http-server-python-test .
+docker run -it --rm -p 4221:4221 http-server-python-test
+```
+
+ WARNING: The script virtualenv.exe is installed in 'C:\Users\ShubhanshuChouhan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
+  WARNING: The scripts pipenv-resolver.exe and pipenv.exe are installed in 'C:\Users\ShubhanshuChouhan\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\Scripts' which is not on PATH.
+  Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
