@@ -58,7 +58,10 @@ class Token:
         self.line = line
 
     def __str__(self):
-        return f"{self.type.name} {self.lexeme} {self.literal}"
+        if self.literal is not None:
+            return f"{self.type.name} {self.lexeme} {self.literal}"
+        else:
+            return f"{self.type.name} {self.lexeme} null"
 
     def __repr__(self):
         return self.__str__()
