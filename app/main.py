@@ -27,8 +27,8 @@ class TokenType(Enum):
     # One or two character tokens
     BANG = 15
     BANG_EQUAL = 16
-    EQUAL = 17
-    EQUAL_EQUAL = 18
+    EQUAL = '='
+    EQUAL_EQUAL = '=='
     GREATER = 19
     GREATER_EQUAL = 20
     LESS = 21
@@ -68,13 +68,111 @@ class Token:
     def __repr__(self):
         return self.__str__()
 
+class Scanner:
+
+    def __init__(self, source):
+        self.start = 0
+        self.current = 0
+        self.tokens = []
+        self.source = source
+        self.had_error = False
+        self.line = 1
+
+    def scan_tokens(self):
+        while not self.is_at_end():
+            self.start = self.current
+            self.scan_token()
+
+        self.add_token(TokenType.EOF)
+
+        return self.tokens
+
+    def scan_token(self):
+        c = self.advance()
+        if c in [" ", "\r", "\t"]:
+            pass
+        elif c == "(":
+            self.add_token(TokenType.LEFT_PAREN)
+        elif c == ")":
+            self.add_token(TokenType.RIGHT_PAREN)
+        elif c == "{":
+            self.add_token(TokenType.LEFT_BRACE)
+        elif c == "}":
+            self.add_token(TokenType.RIGHT_BRACE)
+        elif c == ",":
+            self.add_token(TokenType.COMMA)
+        elif c == ".":
+            self.add_token(TokenType.DOT)
+        elif c == "-":
+            self.add_token(TokenType.MINUS)
+        elif c == "+":
+            self.add_token(TokenType.PLUS)
+        elif c == ";":
+            self.add_token(TokenType.SEMICOLON)
+        elif c == "\n":
+            self.line += 1
+        elif c == "*":
+            self.add_token(TokenType.STAR)
+        elif c == "/":
+            if self.match("/"):
+                while self.peek() != "\n" and not self.is_at_end():
+                    self.advance()
+            elif self.match("*"):
+                while self.peek() != "*" and self.peek(1) != "/" and not self.is_at_end():
+                    self.advance()
+                self.advance()
+                self.advance()
+            else:
+                self.add_token(TokenType.SLASH)
+        elif c == "!":
+            if self.match("="):
+                self.add_token(TokenType.BANG_EQUAL)
+            else:
+                self.add_token(TokenType.BANG)
+        elif c == "=":
+            if self.match("="):
+                self.add_token(TokenType.EQUAL_EQUAL)
+            else:
+                self.add_token(TokenType.EQUAL)
+        else:
+            self.had_error = True
+            sys.stderr.write(f"[line {self.line}] Error: Unexpected character: {c}\n")
+
+    # def error(self, line, message):
+    #     pass
+
+    def match(self, expected):
+        if self.is_at_end():
+            return False
+        if self.source[self.current] != expected:
+            return False
+        self.current += 1
+        return True
+
+    def peek(self, offset=0):
+        if self.current + offset >= len(self.source):
+            return "\0"
+        return self.source[self.current + offset]
+
+    def advance(self):
+        self.current += 1
+        return self.source[self.current - 1]
+
+    def add_token(self, token_type, literal=None):
+        text = ""
+        if token_type != TokenType.EOF:
+            text = self.source[self.start:self.current]
+        self.tokens.append(Token(token_type, text, literal, 0))
+
+    def is_at_end(self):
+        return self.current >= len(self.source)
 # This function will scan for tokens and return array of tokens
 def scan_tokens(content):
     tokens = []
     line = 1
     # token = ""
 
-    for character in content:
+    for (index, character) in enumerate(content):
         # print(character)
         if character in [" ", "\r", "\t"]:
             # token = ""
@@ -134,15 +232,17 @@ def main():
 
     # Uncomment this block to pass the first stage
     tokens = []
+    scanner = None
     if file_contents:
-        tokens = scan_tokens(file_contents)
+        scanner = Scanner(file_contents)
+        tokens = scanner.scan_tokens()
     else:
         print("EOF  null") # Placeholder, remove this line when implementing the scanner
 
     for token in tokens:
         print(token)
 
-    if IS_ERROR_IN_CODE:
+    if scanner and scanner.had_error:
         return 65
 
 if __name__ == "__main__":
