@@ -52,6 +52,25 @@ class TokenType(Enum):
     VAR = 37
     WHILE = 38
 
+KEYWORDS = {
+    "and": TokenType.AND,
+    "class": TokenType.CLASS,
+    "else": TokenType.ELSE,
+    "false": TokenType.FALSE,
+    "for": TokenType.FOR,
+    "fun": TokenType.FUN,
+    "if": TokenType.IF,
+    "nil": TokenType.NIL,
+    "or": TokenType.OR,
+    "print": TokenType.PRINT,
+    "return": TokenType.RETURN,
+    "super": TokenType.SUPER,
+    "this": TokenType.THIS,
+    "true": TokenType.TRUE,
+    "var": TokenType.VAR,
+    "while": TokenType.WHILE
+}
+
 class Token:
     def __init__(self, type, lexeme, literal, line):
         self.type = type
@@ -147,11 +166,46 @@ class Scanner:
         elif c == '"':
             self.string()
         else:
-            self.had_error = True
-            sys.stderr.write(f"[line {self.line}] Error: Unexpected character: {c}\n")
+            if self.is_digit(c):
+                self.number()
+            elif self.is_alpha(c):
+                self.identifier()
+            else:
+                self.had_error = True
+                sys.stderr.write(f"[line {self.line}] Error: Unexpected character: {c}\n")
 
     # def error(self, line, message):
     #     pass
+
+    def is_digit(self, c):
+        return c >= "0" and c <= "9"
+
+    def is_alpha(self, c):
+        return (c >= "a" and c <= "z") or (c >= "A" and c <= "Z") or c == "_"
+
+    def number(self):
+        while self.is_digit(self.peek()):
+            self.advance()
+
+        if self.peek() == "." and self.is_digit(self.peek(1)):
+            self.advance()
+
+        while self.is_digit(self.peek()):
+            self.advance()
+
+        self.add_token(TokenType.NUMBER, float(self.source[self.start : self.current]))
+
+    def identifier(self):
+        while self.is_alpha(self.peek()) or self.is_digit(self.peek()):
+            self.advance()
+
+        text = self.source[self.start : self.current]
+        keyword_type = KEYWORDS.get(text)
+
+        if keyword_type == None:
+            self.add_token(TokenType.IDENTIFIER)
+        else:
+            self.add_token(keyword_type)
 
     def string(self):
         while self.peek() != '"' and not self.is_at_end():
