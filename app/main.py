@@ -134,6 +134,16 @@ class Scanner:
                 self.add_token(TokenType.EQUAL_EQUAL)
             else:
                 self.add_token(TokenType.EQUAL)
+        elif c == "<":
+            if self.match("="):
+                self.add_token(TokenType.LESS_EQUAL)
+            else:
+                self.add_token(TokenType.LESS)
+        elif c == ">":
+            if self.match("="):
+                self.add_token(TokenType.GREATER_EQUAL)
+            else:
+                self.add_token(TokenType.GREATER)
         else:
             self.had_error = True
             sys.stderr.write(f"[line {self.line}] Error: Unexpected character: {c}\n")
@@ -166,52 +176,7 @@ class Scanner:
 
     def is_at_end(self):
         return self.current >= len(self.source)
-# This function will scan for tokens and return array of tokens
-def scan_tokens(content):
-    tokens = []
-    line = 1
-    # token = ""
-
-    for (index, character) in enumerate(content):
-        # print(character)
-        if character in [" ", "\r", "\t"]:
-            # token = ""
-            pass
-        elif character == "\n":
-            line += 1
-        elif character in [
-            TokenType.LEFT_PAREN.value,
-            TokenType.RIGHT_PAREN.value,
-            TokenType.LEFT_BRACE.value,
-            TokenType.RIGHT_BRACE.value,
-            TokenType.COMMA.value,
-            TokenType.DOT.value,
-            TokenType.MINUS.value,
-            TokenType.PLUS.value,
-            TokenType.SEMICOLON.value,
-            TokenType.SLASH.value,
-            TokenType.STAR.value
-        ]:
-            tokens.append(Token(TokenType(character), character, None, 0))
-        # elif character == "=" and content[content.index(character) + 1] == "=":
-        #     token = "=="
-        else:
-            global IS_ERROR_IN_CODE
-            IS_ERROR_IN_CODE = True
-            sys.stderr.write(f"[line {line}] Error: Unexpected character: {character}\n")
-        
-
-    tokens.append(Token(TokenType.EOF, "", None, 0))
-    return tokens
     
-    # Print <token_type> <lexeme> <literal>
-    # for character in content:
-    #     print(f"{character} {TokenType.IDENTIFIER}")
-    #     if character in ["\n", " "]:
-    #         pass
-    #     elif character == " ":
-    # print("EOF null")
-
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     # print("Logs from your program will appear here!", file=sys.stderr)
