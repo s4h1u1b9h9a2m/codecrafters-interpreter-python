@@ -144,12 +144,29 @@ class Scanner:
                 self.add_token(TokenType.GREATER_EQUAL)
             else:
                 self.add_token(TokenType.GREATER)
+        elif c == '"':
+            self.string()
         else:
             self.had_error = True
             sys.stderr.write(f"[line {self.line}] Error: Unexpected character: {c}\n")
 
     # def error(self, line, message):
     #     pass
+
+    def string(self):
+        while self.peek() != '"' and not self.is_at_end():
+            if self.peek() == "\n":
+                self.line += 1
+            self.advance()
+
+        if self.is_at_end():
+            self.had_error = True
+            sys.stderr.write(f"[line {self.line}] Error: Unterminated string.\n")
+            return
+
+        self.advance()
+        value = self.source[self.start + 1 : self.current - 1]
+        self.add_token(TokenType.STRING, value)
 
     def match(self, expected):
         if self.is_at_end():
